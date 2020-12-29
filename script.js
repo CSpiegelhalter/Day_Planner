@@ -7,8 +7,22 @@ var changeHour = currentHour - 12;
 var aboveClassChange;
 var belowClassChange;
 var savedText = '';
+var date = moment().format("dddd, MMM Do");
+
+
+var checkToday = localStorage.getItem("today");
+
+if (checkToday !== date) {
+    localStorage.clear();
+    localStorage.setItem("today", date);
+}
+
 
 $(document).ready(function () {
+
+    $("#currentDay").append(date);
+
+
     // create new block element for each our 9-5 
     for (let index = startTime; index < endTime; index++) {
 
@@ -40,8 +54,9 @@ $(document).ready(function () {
             $(".container").append(dynamicElements)
 
             var load = JSON.parse(localStorage.getItem(`schedule${index}`))
-
             $(`#toSave${index}`).append(load)
+
+            
 
             $(`.saveBtn${index}`).on("click", function() {
 
@@ -55,8 +70,9 @@ $(document).ready(function () {
             $(".container").append(dynamicElementsNoon)
 
             var loadNoon = JSON.parse(localStorage.getItem(`scheduleNoon${index}`))
-
             $(`#toSave${index}`).append(loadNoon)
+
+            
 
             $(`.saveBtn${index}`).on("click", function() {
 
@@ -73,6 +89,8 @@ $(document).ready(function () {
             var loadDay = JSON.parse(localStorage.getItem(`scheduleDay${index}`))
 
             $(`#toSave${index}`).append(loadDay)
+            
+            
 
             $(`.saveBtn${index}`).on("click", function() {
 
@@ -81,6 +99,7 @@ $(document).ready(function () {
         }
         
     }
+    
 })
 
 
