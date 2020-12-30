@@ -1,17 +1,21 @@
+// Shows what the current hour is to determine color of textarea 
+var currentHour = moment().hour();
 
-var timeDif = 12;
+// Business hour are from 9am-5pm
 var startTime = 9;
 var endTime = 18;
-var currentHour = moment().hour();
-var changeHour = currentHour - 12;
-var aboveClassChange;
-var belowClassChange;
-var savedText = '';
+
+// Initialize variables to use later 
+var timeChanger;
+var time;
+
+// Current date 
 var date = moment().format("dddd, MMM Do");
 
-
+// Date stored in localstorage 
 var checkToday = localStorage.getItem("today");
 
+// If the day changed then clear data from previous day and store the current date 
 if (checkToday !== date) {
     localStorage.clear();
     localStorage.setItem("today", date);
@@ -20,93 +24,60 @@ if (checkToday !== date) {
 
 $(document).ready(function () {
 
+    // Displays the date at the top of the screen 
     $("#currentDay").append(date);
 
 
     // create new block element for each our 9-5 
     for (let index = startTime; index < endTime; index++) {
 
+        // Changed 24-hour clock to 12-hour clock 
         var changeTime = index - 12;
 
-        if (changeTime > changeHour) {
-            aboveClassChange = 'future';
-        }
-        else if (changeTime < changeHour) {
-            aboveClassChange = 'past';
-        }
-        else {
-            aboveClassChange = 'present';
-        }
-
+        // Compares the loop iteration to the current hour to determine the textarea color 
         if (index > currentHour) {
-            belowClassChange = 'future';
+            ClassChange = 'future';
         }
         else if (index < currentHour) {
-            belowClassChange = 'past';
+            ClassChange = 'past';
         }
         else {
-            belowClassChange = 'present';
+            ClassChange = 'present';
         }
 
-        if (index > 12) {
-            var dynamicElements = (`<div id="hour-${index}" class="row time-block"><div class="col-md-1 hour">${changeTime}PM</div><textarea id="toSave${index}" class="col-md-10 description${index} ${aboveClassChange}"></textarea><button class="btn saveBtn${index} col-md-1"><i class="fas fa-save"></i></button></div>`)
+        // Changes the time from 24-hour to 12-hour and changes it to PM
+        if (index >= 12) {
+            timeChanger = changeTime;
+            time = "PM"
 
-            $(".container").append(dynamicElements)
-
-            var load = JSON.parse(localStorage.getItem(`schedule${index}`))
-            $(`#toSave${index}`).append(load)
-
-            
-
-            $(`.saveBtn${index}`).on("click", function() {
-
-                localStorage.setItem(`schedule${index}`, JSON.stringify($(`#toSave${index}`).val()))
-            })
+            // Sets time to 12 otherwise it would be zero 
+            if (index == 12) {
+                timeChanger = 12
+            }
         }
 
-        else if (index == 12) {
-            var dynamicElementsNoon = (`<div id="hour-${index}" class="row time-block"><div class="col-md-1 hour">${index}PM</div><textarea id="toSave${index}" class="col-md-10 description ${belowClassChange}"></textarea><button class="btn saveBtn${index} col-md-1"><i class="fas fa-save"></i></button></div>`)
-        
-            $(".container").append(dynamicElementsNoon)
-
-            var loadNoon = JSON.parse(localStorage.getItem(`scheduleNoon${index}`))
-            $(`#toSave${index}`).append(loadNoon)
-
-            
-
-            $(`.saveBtn${index}`).on("click", function() {
-
-                localStorage.setItem(`scheduleNoon${index}`, JSON.stringify($(`#toSave${index}`).val()))
-            })
-        
-        }
-
+        // Displays all AM hours 
         else {
-            var dynamicElementsDay = (`<div id="hour-${index}" class="row time-block"><div class="col-md-1 hour">${index}AM</div><textarea id="toSave${index}" class="col-md-10 description ${belowClassChange}"></textarea><button class="btn saveBtn${index} col-md-1"><i class="fas fa-save"></i></button></div>`)
-
-            $(".container").append(dynamicElementsDay)
-
-            var loadDay = JSON.parse(localStorage.getItem(`scheduleDay${index}`))
-
-            $(`#toSave${index}`).append(loadDay)
-            
-            
-
-            $(`.saveBtn${index}`).on("click", function() {
-
-                localStorage.setItem(`scheduleDay${index}`, JSON.stringify($(`#toSave${index}`).val()))
-            })
+            timeChanger = index;
+            time = "AM"
         }
-        
-    }
-    
+
+        // Creates an HTML row and places the hour display, textarea, and save button within it
+        var dynamicElements = (`<div id="hour-${index}" class="row time-block"><div class="col-md-1 hour">${timeChanger}${time}</div><textarea id="toSave${index}" class="col-md-10 description${index} ${ClassChange}"></textarea><button class="btn saveBtn${index} col-md-1"><i class="fas fa-save"></i></button></div>`)
+
+        // Appends dynamically created elements to the page 
+        $(".container").append(dynamicElements)
+
+        // Gets previously saved textarea data
+        var load = JSON.parse(localStorage.getItem(`schedule${index}`))
+
+        // Appends saved data to its respective textarea
+        $(`#toSave${index}`).append(load)
+
+        // Creates an onclick event that saves the data within its textarea. It's differentiated by its index number 
+        $(`.saveBtn${index}`).on("click", function() {
+
+            localStorage.setItem(`schedule${index}`, JSON.stringify($(`#toSave${index}`).val()))
+        })
+        }    
 })
-
-
-
-
-
-
-
-
-
